@@ -1,0 +1,77 @@
+apply plugin: 'com.android.application'
+
+apply from: rootProject.file('gradle/checks/checkstyle.gradle')
+apply from: rootProject.file('gradle/checks/findbugs.gradle')
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
+
+    defaultConfig {
+        applicationId 'io.github.samueljarosinski.ambilight'
+
+        versionName '0.1.0'
+        versionCode 1
+
+        minSdkVersion 21
+        targetSdkVersion 27
+    }
+
+    signingConfigs {
+        release {
+            Properties signingProperties = new Properties()
+            signingProperties.load(new FileInputStream(rootProject.file('signing.properties')))
+
+            storeFile rootProject.file(signingProperties['storeFile'])
+            storePassword signingProperties['storePassword']
+            keyAlias signingProperties['keyAlias']
+            keyPassword signingProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+
+            signingConfig signingConfigs.release
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+    }
+
+    compileOptions {
+        incremental true
+
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dexOptions {
+        dexInProcess true
+        maxProcessCount 4
+        javaMaxHeapSize '4g'
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    lintOptions {
+        abortOnError true
+        ignoreWarnings false
+        warningsAsErrors true
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources true
+        }
+    }
+}

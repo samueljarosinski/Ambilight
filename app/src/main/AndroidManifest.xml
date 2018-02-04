@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="io.github.samueljarosinski.ambilight">
+
+    <application
+        android:allowBackup="false"
+        android:label="Ambilight"
+        android:theme="@android:style/Theme.NoDisplay"
+        tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon" />
+
+</manifest>
