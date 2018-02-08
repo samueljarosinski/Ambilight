@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 apply from: rootProject.file('gradle/checks/checkstyle.gradle')
 apply from: rootProject.file('gradle/checks/findbugs.gradle')
@@ -74,4 +75,19 @@ android {
             includeAndroidResources true
         }
     }
+}
+
+dependencies {
+    def supportVersion = '27.0.2'
+
+    implementation(
+            "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
+
+            "com.android.support:support-annotations:$supportVersion",
+            "com.android.support:support-compat:$supportVersion",
+            "com.android.support:support-core-utils:$supportVersion",
+            "com.android.support:palette-v7:$supportVersion",
+
+            'com.jakewharton.timber:timber:4.6.0'
+    )
 }

@@ -5,10 +5,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="io.github.samueljarosinski.ambilight">
 
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
     <application
+        android:name=".AmbilightApplication"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Ambilight"
         android:allowBackup="false"
-        android:label="Ambilight"
-        android:theme="@android:style/Theme.NoDisplay"
-        tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon" />
+        tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon">
+
+        <activity
+            android:name=".ActivityMain"
+            android:banner="@drawable/banner"
+            android:excludeFromRecents="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".permission.ActivityScreenCapturePermission"
+            android:excludeFromRecents="true" />
+
+        <service
+            android:name=".ambilight.AmbilightService"
+            android:label="@string/label_service_ambilight"
+            android:description="@string/label_service_ambilight_description"
+            android:exported="false" />
+
+    </application>
 
 </manifest>

@@ -2,4 +2,8 @@
 
 <lint>
 
+    <issue
+        id="IconMissingDensityFolder"
+        severity="ignore" />
+
 </lint>
