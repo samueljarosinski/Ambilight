@@ -10,6 +10,7 @@
 
     <string name="label_service_ambilight">&app_name; service</string>
     <string name="label_service_ambilight_description">&app_name; service</string>
+    <string name="label_hue_connecting">Connecting to Hue…</string>
     <string name="label_ambilight_active">&app_name; active</string>
 
     <string name="action_stop">Stop</string>

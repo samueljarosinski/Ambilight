@@ -7,6 +7,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.philips.lighting.hue.sdk.wrapper.HueLog
+import com.philips.lighting.hue.sdk.wrapper.Persistence
 import io.github.samueljarosinski.ambilight.ambilight.AmbilightService
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -19,6 +21,9 @@ class AmbilightApplication : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         }
+
+        Persistence.setStorageLocation(filesDir.absolutePath, Build.MODEL)
+        HueLog.setConsoleLogLevel(HueLog.LogLevel.INFO, HueLog.LogComponent.ALL)
 
         createNotificationChannels()
     }
@@ -36,6 +41,12 @@ class AmbilightApplication : Application() {
                 lockscreenVisibility = Notification.VISIBILITY_SECRET
                 setShowBadge(false)
             })
+        }
+    }
+
+    companion object {
+        init {
+            System.loadLibrary("huesdk")
         }
     }
 
