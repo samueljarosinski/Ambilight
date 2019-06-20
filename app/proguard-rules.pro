@@ -12,7 +12,3 @@
     public static *** i(...);
     public static *** v(...);
 }
-
-### Android Support Libraries
--keep class android.support.v4.** { *; }
--keep interface android.support.v4.** { *; }

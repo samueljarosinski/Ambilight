@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<lint>
+
+    <issue
+        id="IconMissingDensityFolder"
+        severity="ignore" />
+
+    <issue id="WrongConstant">
+        <ignore path="*/**/java/io/github/samueljarosinski/ambilight/ambilight/ScreenImageProvider.kt" />
+    </issue>
+
+</lint>
