@@ -2,29 +2,25 @@ package io.github.samueljarosinski.ambilight.ambilight
 
 import android.content.Context
 import io.github.samueljarosinski.ambilight.hue.HueController
-import io.github.samueljarosinski.ambilight.permission.PermissionResult
+import io.github.samueljarosinski.ambilight.hue.MIN_UPDATE_DELAY
+import io.github.samueljarosinski.ambilight.hue.OnHueConnectionListener
 import timber.log.Timber
 
 internal class AmbilightSession(
     context: Context,
-    permissionResult: PermissionResult,
     private val onSessionCallback: OnSessionCallback
 ) {
 
     private val hueController = HueController()
-    private val screenImageProvider: ScreenImageProvider = ScreenImageProvider(context, permissionResult)
-    private val colorExtractor: ColorExtractor = ColorExtractor(HueController.MIN_UPDATE_DELAY, hueController::setColor)
+    private val screenImageProvider = ScreenImageProvider(context)
+    private val colorExtractor = ColorExtractor(MIN_UPDATE_DELAY, hueController::setColor)
 
     init {
-        hueController.start(object : HueController.OnHueConnectionListener {
-            override fun onConnected() {
-                start()
-            }
-
-            override fun onConnectionError() {
-                onSessionCallback.onAmbilightSessionError()
-            }
-
+        hueController.start(object : OnHueConnectionListener {
+            override fun onNoBridgesFound() = onSessionCallback.onNoBridgesFound()
+            override fun onNotAuthenticated() = onSessionCallback.onNotAuthenticated()
+            override fun onConnectionError() = onSessionCallback.onAmbilightSessionError()
+            override fun onConnected() = start()
         })
     }
 
@@ -41,10 +37,11 @@ internal class AmbilightSession(
         screenImageProvider.stop()
         hueController.stop()
     }
-
 }
 
 internal interface OnSessionCallback {
     fun onAmbilightSessionStarted()
     fun onAmbilightSessionError()
+    fun onNotAuthenticated()
+    fun onNoBridgesFound()
 }

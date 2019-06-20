@@ -1,18 +1,18 @@
 package io.github.samueljarosinski.ambilight
 
-import android.annotation.TargetApi
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
+import androidx.core.content.getSystemService
 import com.philips.lighting.hue.sdk.wrapper.HueLog
 import com.philips.lighting.hue.sdk.wrapper.Persistence
 import io.github.samueljarosinski.ambilight.ambilight.AmbilightService
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
+@Suppress("unused")
 class AmbilightApplication : Application() {
 
     override fun onCreate() {
@@ -28,12 +28,9 @@ class AmbilightApplication : Application() {
         createNotificationChannels()
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            notificationManager.createNotificationChannel(NotificationChannel(
+            getSystemService<NotificationManager>()?.createNotificationChannel(NotificationChannel(
                 AmbilightService.NOTIFICATION_CHANNEL_ID,
                 getString(R.string.label_service_ambilight),
                 NotificationManager.IMPORTANCE_MIN
@@ -49,5 +46,4 @@ class AmbilightApplication : Application() {
             System.loadLibrary("huesdk")
         }
     }
-
 }

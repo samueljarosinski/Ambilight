@@ -5,13 +5,13 @@ import android.content.Intent
 import io.github.samueljarosinski.ambilight.permission.ScreenCapturePermissionRequester
 import timber.log.Timber
 
-class AmbilightManager {
+object AmbilightManager {
 
     internal fun start(context: Context) {
         Timber.d("Starting Ambilight.")
 
-        ScreenCapturePermissionRequester.requestScreenCapturePermission(context) { permissionResult ->
-            context.startService(AmbilightService.createStartIntent(context, permissionResult))
+        ScreenCapturePermissionRequester.requestScreenCapturePermission(context) {
+            context.startService(AmbilightService.createStartIntent(context))
         }
     }
 
@@ -20,5 +20,4 @@ class AmbilightManager {
 
         context.stopService(Intent(context, AmbilightService::class.java))
     }
-
 }

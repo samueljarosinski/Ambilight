@@ -15,15 +15,17 @@ import android.media.projection.MediaProjectionManager
 import android.os.Handler
 import android.view.Display
 import android.view.WindowManager
-import io.github.samueljarosinski.ambilight.permission.PermissionResult
+import androidx.core.content.getSystemService
+import io.github.samueljarosinski.ambilight.permission.ScreenCapturePermissionRequester
 import timber.log.Timber
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 typealias OnScreenImageAvailableListener = (Bitmap) -> Unit
 
 private data class ImageSize(val width: Int, val height: Int) {
 
     companion object {
-
         private const val MAX_IMAGE_AREA = 112 * 112
 
         fun fromDisplay(display: Display): ImageSize {
@@ -32,17 +34,19 @@ private data class ImageSize(val width: Int, val height: Int) {
             val (x, y) = displaySize
 
             val displayArea = x * y
-            val scale = Math.sqrt(MAX_IMAGE_AREA / displayArea.toDouble())
+            val scale = sqrt(MAX_IMAGE_AREA / displayArea.toDouble())
 
-            val width = Math.ceil(x * scale).toInt()
-            val height = Math.ceil(y * scale).toInt()
+            val width = ceil(x * scale).toInt()
+            val height = ceil(y * scale).toInt()
 
             return ImageSize(width, height)
         }
     }
 }
 
-internal class ScreenImageProvider(context: Context, permissionResult: PermissionResult) : OnImageAvailableListener {
+internal class ScreenImageProvider(
+    context: Context
+) : OnImageAvailableListener {
 
     private val imageSize = ImageSize.fromDisplay(context.getDefaultDisplay())
     private val handler = Handler()
@@ -52,8 +56,11 @@ internal class ScreenImageProvider(context: Context, permissionResult: Permissio
     private var onScreenImageAvailableListener: OnScreenImageAvailableListener? = null
 
     init {
-        val mediaProjectionManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        mediaProjection = mediaProjectionManager.getMediaProjection(permissionResult.code, permissionResult.data)
+        val permissionResult = ScreenCapturePermissionRequester.permissionResult
+            ?: throw IllegalStateException("Permission result not available!")
+
+        mediaProjection = context.getSystemService<MediaProjectionManager>()
+            ?.getMediaProjection(permissionResult.code, permissionResult.data)
     }
 
     fun start(onScreenImageAvailableListener: OnScreenImageAvailableListener) {
@@ -87,26 +94,29 @@ internal class ScreenImageProvider(context: Context, permissionResult: Permissio
     }
 
     private fun createVirtualDisplay(): VirtualDisplay {
-        imageReader = ImageReader.newInstance(imageSize.width, imageSize.height, PixelFormat.RGBA_8888, MAX_IMAGES).apply {
+        imageReader = ImageReader.newInstance(
+            imageSize.width,
+            imageSize.height,
+            PixelFormat.RGBA_8888,
+            MAX_IMAGES
+        ).apply {
             setOnImageAvailableListener(this@ScreenImageProvider, handler)
         }
 
-        return mediaProjection!!.createVirtualDisplay(
+        return mediaProjection?.createVirtualDisplay(
             VIRTUAL_DISPLAY_NAME, imageSize.width, imageSize.height, 1,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader!!.surface, null, null
-        )
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader?.surface, null, null
+        ) ?: throw IllegalStateException("Media projection not started!")
     }
 
     companion object {
         private const val VIRTUAL_DISPLAY_NAME = "Ambilight"
         private const val MAX_IMAGES = 2
     }
-
 }
 
-private fun Context.getDefaultDisplay(): Display {
-    return (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-}
+private fun Context.getDefaultDisplay(): Display =
+    getSystemService<WindowManager>()?.defaultDisplay ?: throw IllegalStateException()
 
 private fun Image.toBitmap(width: Int, height: Int): Bitmap {
     val plane = planes[0]

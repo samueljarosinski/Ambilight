@@ -11,7 +11,7 @@ class ActivityMain : Activity() {
 
         overridePendingTransition(0, 0)
 
-        AmbilightManager().start(this)
+        AmbilightManager.start(this)
 
         finish()
     }
@@ -21,5 +21,4 @@ class ActivityMain : Activity() {
 
         overridePendingTransition(0, 0)
     }
-
 }

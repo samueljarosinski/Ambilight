@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import androidx.core.content.getSystemService
 import timber.log.Timber
 
 class ActivityScreenCapturePermission : Activity() {
@@ -24,17 +25,25 @@ class ActivityScreenCapturePermission : Activity() {
 
         Timber.d("Sending screen capture permission request intent.")
 
-        val mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE_SCREEN_CAPTURE)
+        startActivityForResult(
+            getSystemService<MediaProjectionManager>()?.createScreenCaptureIntent(),
+            REQUEST_CODE_SCREEN_CAPTURE
+        )
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE_SCREEN_CAPTURE) {
             Timber.d("Received permission result: $resultCode $data")
 
-            ScreenCapturePermissionRequester.permissionResult = PermissionResult(resultCode, data)
+            if (resultCode == RESULT_OK && data != null) {
+                Timber.d("Screen capture permission was granted!")
+
+                ScreenCapturePermissionRequester.permissionResult = PermissionResult(resultCode, data)
+            } else {
+                Timber.d("Screen capture permission was denied!")
+            }
         }
 
         finish()
@@ -51,11 +60,9 @@ class ActivityScreenCapturePermission : Activity() {
         private const val REQUEST_CODE_SCREEN_CAPTURE = 7272
         private const val EXTRA_PERMISSION_REQUEST = "EXTRA_PERMISSION_REQUEST"
 
-        internal fun createStartIntent(context: Context): Intent {
-            return Intent(context, ActivityScreenCapturePermission::class.java)
+        internal fun createStartIntent(context: Context): Intent =
+            Intent(context, ActivityScreenCapturePermission::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(EXTRA_PERMISSION_REQUEST, true)
-        }
     }
-
 }

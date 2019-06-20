@@ -13,6 +13,9 @@
     <string name="label_hue_connecting">Connecting to Hue…</string>
     <string name="label_ambilight_active">&app_name; active</string>
 
+    <string name="msg_no_bridges_found">No bridges found</string>
+    <string name="msg_not_authenticated">Push the button!</string>
+
     <string name="action_stop">Stop</string>
 
 </resources>

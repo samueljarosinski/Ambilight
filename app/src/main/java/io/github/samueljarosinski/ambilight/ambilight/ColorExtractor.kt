@@ -2,7 +2,7 @@ package io.github.samueljarosinski.ambilight.ambilight
 
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.support.v7.graphics.Palette
+import androidx.palette.graphics.Palette
 
 typealias ColorExtractedListener = (Int) -> Unit
 
@@ -30,5 +30,4 @@ internal class ColorExtractor(
 
         bitmap.recycle()
     }
-
 }

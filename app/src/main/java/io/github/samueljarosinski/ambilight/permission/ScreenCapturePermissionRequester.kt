@@ -1,63 +1,44 @@
 package io.github.samueljarosinski.ambilight.permission
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import timber.log.Timber
-import java.io.Serializable
 
-data class PermissionResult(val code: Int, val data: Intent?) : Serializable
+data class PermissionResult(val code: Int, val data: Intent)
 
-typealias PermissionResultListener = (PermissionResult) -> Unit
+typealias OnPermissionGrantedListener = () -> Unit
 
 object ScreenCapturePermissionRequester {
 
-    private var permissionResultListener: PermissionResultListener? = null
+    private var onPermissionGrantedListener: OnPermissionGrantedListener? = null
 
     var permissionResult: PermissionResult? = null
         internal set(value) {
-            when (value?.code) {
-                Activity.RESULT_OK -> {
-                    notifyResultListener()
-                }
+            field = value
 
-                Activity.RESULT_CANCELED -> {
-                    field = null
-
-                    Timber.w("Screen capture permission was denied.")
-                }
-
-                else -> {
-                    field = null
-
-                    Timber.w("Unhandled result code ${permissionResult?.code}.")
-                }
+            if (value != null) {
+                notifyResultListener()
             }
         }
 
-    fun requestScreenCapturePermission(context: Context, resultListener: PermissionResultListener) {
+    fun requestScreenCapturePermission(context: Context, resultListener: OnPermissionGrantedListener) {
         Timber.d("Requesting screen capture permission.")
 
-        permissionResultListener = resultListener
+        onPermissionGrantedListener = resultListener
 
         if (permissionResult != null) {
             Timber.d("Permission already granted.")
 
             notifyResultListener()
         } else {
-            openScreenshotPermissionRequester(context)
+            context.startActivity(ActivityScreenCapturePermission.createStartIntent(context))
         }
     }
 
     private fun notifyResultListener() {
         Timber.d("Notifying about permission result.")
 
-        permissionResultListener?.invoke(permissionResult!!)
-        permissionResultListener = null
+        onPermissionGrantedListener?.invoke()
+        onPermissionGrantedListener = null
     }
-
-    private fun openScreenshotPermissionRequester(context: Context) {
-        context.startActivity(ActivityScreenCapturePermission.createStartIntent(context))
-    }
-
 }
